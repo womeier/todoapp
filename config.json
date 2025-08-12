@@ -1,0 +1,9 @@
+{
+  "packageName": "client_api",
+  "projectName": "client",
+  "packageVersion": "0.0.1",
+  "packageUrl": "https://github.com/womeier/todoapp",
+  "packageAuthor": "Wolfgang Meier",
+  "modelDocs": true,
+  "apiDocs": true
+}
