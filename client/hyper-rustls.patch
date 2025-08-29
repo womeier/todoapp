@@ -1,0 +1,59 @@
+diff --git b/client/api/src/apis/configuration.rs a/client/api/src/apis/configuration.rs
+index bc33086..a267918 100644
+--- b/client/api/src/apis/configuration.rs
++++ a/client/api/src/apis/configuration.rs
+@@ -9,12 +9,13 @@
+  */
+
+ use hyper;
++use hyper_rustls::{ConfigBuilderExt, HttpsConnector, HttpsConnectorBuilder};
+ use hyper_util::client::legacy::connect::Connect;
+ use hyper_util::client::legacy::connect::HttpConnector;
+ use hyper_util::client::legacy::Client;
+ use hyper_util::rt::TokioExecutor;
+
+-pub struct Configuration<C: Connect = HttpConnector>
++pub struct Configuration<C: Connect = HttpsConnector<HttpConnector>>
+ where
+     C: Clone + std::marker::Send + Sync + 'static,
+ {
+@@ -34,7 +35,7 @@ pub struct ApiKey {
+     pub key: String,
+ }
+
+-impl Configuration<HttpConnector> {
++impl Configuration<HttpsConnector<HttpConnector>> {
+     /// Construct a default [`Configuration`](Self) with a hyper client using a default
+     /// [`HttpConnector`](hyper_util::client::legacy::connect::HttpConnector).
+     ///
+@@ -50,7 +51,7 @@ impl Configuration<HttpConnector> {
+     ///   ..Configuration::new()
+     /// };
+     /// ```
+-    pub fn new() -> Configuration<HttpConnector> {
++    pub fn new() -> Configuration<HttpsConnector<HttpConnector>> {
+         Configuration::default()
+     }
+ }
+@@ -87,9 +88,19 @@ where
+     }
+ }
+
+-impl Default for Configuration<HttpConnector> {
++impl Default for Configuration<HttpsConnector<HttpConnector>> {
+     fn default() -> Self {
+-        let client = Client::builder(TokioExecutor::new()).build_http();
++        let config = rustls::ClientConfig::builder()
++            .with_native_roots()
++            .expect("Native roots failed.")
++            .with_no_client_auth();
++        let client = Client::builder(TokioExecutor::new()).build(
++            HttpsConnectorBuilder::new()
++                .with_tls_config(config)
++                .https_or_http()
++                .enable_http1()
++                .build(),
++        );
+         Configuration::with_client(client)
+     }
+ }

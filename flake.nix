@@ -20,7 +20,6 @@
         packages = with pkgs; [
           jre
           openapi-generator-cli
-          perl # for openssl
         ];
       in
       {

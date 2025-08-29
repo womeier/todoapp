@@ -27,9 +27,7 @@ openapi-update:
     openapi-generator-cli generate -i openapi.json -g rust -c config.json --library hyper -o ./client/api
 
     # patch client to support TLS
-    cd ./client/api/ && cargo add hyper-tls@0.6.0
-    sed "s/HttpConnector>/HttpsConnector<HttpConnector>>/g" -i ./client/api/src/apis/configuration.rs
-    sed "s/build_http()/build(HttpsConnector::new())/g" -i ./client/api/src/apis/configuration.rs
-    sed "s/use hyper;/use hyper; use hyper_tls::HttpsConnector;/g" -i ./client/api/src/apis/configuration.rs
-
+    cd ./client/api && cargo fmt
+    cd ./client/api/ && cargo add hyper-rustls rustls
+    git apply ./client/hyper-rustls.patch
     cd ./client/api && cargo fmt

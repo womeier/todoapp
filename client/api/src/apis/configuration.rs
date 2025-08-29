@@ -9,7 +9,7 @@
  */
 
 use hyper;
-use hyper_tls::HttpsConnector;
+use hyper_rustls::{ConfigBuilderExt, HttpsConnector, HttpsConnectorBuilder};
 use hyper_util::client::legacy::connect::Connect;
 use hyper_util::client::legacy::connect::HttpConnector;
 use hyper_util::client::legacy::Client;
@@ -72,7 +72,7 @@ where
     ///
     /// let client = Client::builder(TokioExecutor::new())
     ///   .pool_idle_timeout(Duration::from_secs(30))
-    ///   .build(HttpsConnector::new());
+    ///   .build_http();
     ///
     /// let api_config = Configuration::with_client(client);
     /// ```
@@ -90,7 +90,17 @@ where
 
 impl Default for Configuration<HttpsConnector<HttpConnector>> {
     fn default() -> Self {
-        let client = Client::builder(TokioExecutor::new()).build(HttpsConnector::new());
+        let config = rustls::ClientConfig::builder()
+            .with_native_roots()
+            .expect("Native roots failed.")
+            .with_no_client_auth();
+        let client = Client::builder(TokioExecutor::new()).build(
+            HttpsConnectorBuilder::new()
+                .with_tls_config(config)
+                .https_or_http()
+                .enable_http1()
+                .build(),
+        );
         Configuration::with_client(client)
     }
 }
