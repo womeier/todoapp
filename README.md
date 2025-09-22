@@ -1,4 +1,4 @@
-# Wolfgang's fancy simple todo app
+# A simple todo app for the terminal
 This simple app allows managing tasks using a simple CLI in the terminal.
 
 Tasks can be tagged as *Todo Now* / *Watch* / *Later*, inspired by Marc Andreesen's [guide on productivity](https://pmarchive.com/guide_to_personal_productivity.html).
